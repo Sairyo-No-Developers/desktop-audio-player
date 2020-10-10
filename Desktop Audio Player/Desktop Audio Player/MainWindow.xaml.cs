@@ -40,7 +40,7 @@ namespace Desktop_Audio_Player
         bool scroll_title = false;
         bool scroll_info = false;
         YoutubeClient youtube = new YoutubeClient();
-        public MainWindow() {
+        public MainWindow(bool open_with, string filename = "") {
             InitializeComponent();
             file_search.Visibility = Visibility.Visible;
             youtube_search.Visibility = Visibility.Visible;
@@ -61,6 +61,10 @@ namespace Desktop_Audio_Player
             timer.Interval = TimeSpan.FromMilliseconds(650);
             timer.Tick += scroll_tick;
             timer.Start();
+            if (open_with)
+            {
+                Open_With_Func(filename);
+            }
         }
 
         private void scroll_tick(object sender, EventArgs e)
@@ -140,6 +144,44 @@ namespace Desktop_Audio_Player
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void Open_With_Func(string filename)
+        {
+            if (true)
+            {
+                File_Name.Text = filename;
+                mediaPlayer.Open(new Uri(filename));
+                controls.Visibility = Visibility.Visible;
+                file_search.Visibility = Visibility.Hidden;
+                youtube_search.Visibility = Visibility.Hidden;
+                var tfile = TagLib.File.Create(filename);
+                song_title = tfile.Tag.Title;
+                song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
+                if (song_title.Length > 22)
+                {
+                    scroll_title = true;
+                    song_title = song_title + "    ";
+                    song_title_xaml.Text = song_title.Substring(0, 22);
+                }
+                else
+                {
+                    scroll_title = false;
+                    song_title_xaml.Text = song_title;
+                }
+                if (song_info.Length > 32)
+                {
+                    scroll_info = true;
+                    song_info = song_info + "    ";
+                    song_info_xaml.Text = song_info;
+                }
+                else
+                {
+                    scroll_info = false;
+                    song_info_xaml.Text = song_info;
+                }
+            }
+            Open_With_Play();
         }
         private void BT_Click_Open(object sender, RoutedEventArgs e)
         {
@@ -242,6 +284,18 @@ namespace Desktop_Audio_Player
 
         private void BT_Click_Play(object sender, RoutedEventArgs e)
         { 
+            mediaPlayer.Play();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Tick += timer_Tick;
+            timer.Start();
+            file_search.Visibility = Visibility.Hidden;
+            play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
+            mediaPlayer.Volume = volume;
+        }
+
+        private void Open_With_Play()
+        {
             mediaPlayer.Play();
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(500);

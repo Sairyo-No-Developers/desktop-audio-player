@@ -13,5 +13,18 @@ namespace Desktop_Audio_Player
     /// </summary>
     public partial class App : Application
     {
-    }
+		private void Application_Startup(object sender, StartupEventArgs e)
+		{
+			MainWindow wnd;
+            if (e.Args.Length > 0)
+            {
+                wnd = new MainWindow(true, e.Args[0]);
+            }
+            else
+            {
+                wnd = new MainWindow(false);
+            }
+            wnd.Show();
+		}
+	}
 }
