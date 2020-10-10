@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Abhishek Adhikari\\source\\repos\\abhishekadhikari23\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj": {}
+    "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Abhishek Adhikari\\source\\repos\\abhishekadhikari23\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj": {
+    "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Abhishek Adhikari\\source\\repos\\abhishekadhikari23\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
+        "projectUniqueName": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
         "projectName": "Desktop Audio Player",
-        "projectPath": "C:\\Users\\Abhishek Adhikari\\source\\repos\\abhishekadhikari23\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
+        "projectPath": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
         "packagesPath": "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Abhishek Adhikari\\source\\repos\\abhishekadhikari23\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\obj\\",
+        "outputPath": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Abhishek Adhikari\\AppData\\Roaming\\NuGet\\NuGet.Config",
