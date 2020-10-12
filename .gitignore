@@ -1,3 +1,9 @@
 Desktop Audio Player/Desktop Audio Player/bin/
 Desktop Audio Player/Desktop Audio Player/obj/
 Desktop Audio Player/Desktop Audio Player/Properties/
+*.dtbcache.v2
+*.suo
+*.assests.cache
+*.csprojAssemblyReference.cache
+*.i.cache
+*.g.i.cs
