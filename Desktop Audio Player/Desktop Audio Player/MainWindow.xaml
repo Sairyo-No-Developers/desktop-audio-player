@@ -19,7 +19,7 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,0">
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" Text="Sairyö No Player" TextAlignment="Center" Margin="0,0,0,10"/>
-                <materialDesign:Card x:Name="file_search" Padding="10,5,10,2" Visibility="Hidden">
+                <materialDesign:Card x:Name="file_search" Padding="10,5,10,2" Visibility="Visible">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Foreground="White" Text="File Name      :" FontSize="22"/>
                         <TextBox x:Name="File_Name" FontSize="22" Width="260" Margin="10,0,0,0"/>
@@ -34,7 +34,7 @@
                         </Button>
                     </StackPanel>
                 </materialDesign:Card>
-                <materialDesign:Card x:Name="youtube_search" Padding="10,5,10,2" Visibility="Hidden">
+                <materialDesign:Card x:Name="youtube_search" Padding="10,5,10,2" Visibility="Visible">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Foreground="White" Text="YouTube URL :" FontSize="22"/>
                         <TextBox x:Name="url_youtube" FontSize="22" Width="260" Margin="10,0,0,0"/>
@@ -47,6 +47,12 @@
                                 </LinearGradientBrush>
                             </Button.Background>
                         </Button>
+                    </StackPanel>
+                </materialDesign:Card>
+                <materialDesign:Card x:Name="sync_bar" Padding="10,5,10,2" Visibility="Visible">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Foreground="White" Text="Sync Session  :" FontSize="22"/>
+                        <TextBox x:Name="session_name" FontSize="22" Width="331" Margin="10,0,0,0"/>
                     </StackPanel>
                 </materialDesign:Card>
             </StackPanel>

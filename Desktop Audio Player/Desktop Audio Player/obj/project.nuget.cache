@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "YC8iGXw6KFGiBxhKYF7GgVDsOcR53W0vgEJqfbquJQwSAWTkaHsaD/9KhlYM7LL/uSu4AN+rEUvK/Qh5i5ZBfw==",
+  "dgSpecHash": "L2lV13lQbUfYtDscia/cLAXQn+9JfToOZkBCc6Kq14GtV5bABI7+ElnhYMaVJgHFTTvBsc/6Swj9gOtMqMcmSw==",
   "success": true,
   "projectFilePath": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
   "expectedPackageFiles": [
@@ -8,9 +8,11 @@
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\materialdesigncolors\\1.2.7\\materialdesigncolors.1.2.7.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\materialdesignthemes\\3.2.0\\materialdesignthemes.3.2.0.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\microsoft.netcore.platforms\\2.0.0\\microsoft.netcore.platforms.2.0.0.nupkg.sha512",
+    "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.0\\system.runtime.compilerservices.unsafe.4.5.0.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\system.text.encoding.codepages\\4.5.0\\system.text.encoding.codepages.4.5.0.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\taglib-sharp-netstandard2.0\\2.1.0\\taglib-sharp-netstandard2.0.2.1.0.nupkg.sha512",
+    "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\websocketsharp-netstandard\\1.0.1\\websocketsharp-netstandard.1.0.1.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\youtubeexplode\\5.1.6\\youtubeexplode.5.1.6.nupkg.sha512"
   ],
   "logs": []

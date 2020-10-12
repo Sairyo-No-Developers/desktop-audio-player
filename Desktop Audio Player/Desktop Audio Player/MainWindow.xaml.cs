@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.Xml.Schema;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
+using WebSocketSharp;
 
 namespace Desktop_Audio_Player
 {
@@ -39,6 +40,10 @@ namespace Desktop_Audio_Player
         string song_info = "";
         bool scroll_title = false;
         bool scroll_info = false;
+        bool is_syncing = false;
+        string session = "";
+        WebSocket sync_socket;
+        bool is_host = true;
         YoutubeClient youtube = new YoutubeClient();
         public MainWindow(bool open_with, string filename = "") {
             InitializeComponent();
@@ -65,6 +70,7 @@ namespace Desktop_Audio_Player
             {
                 Open_With_Func(filename);
             }
+           
         }
 
         private void scroll_tick(object sender, EventArgs e)
@@ -148,38 +154,35 @@ namespace Desktop_Audio_Player
 
         private void Open_With_Func(string filename)
         {
-            if (true)
+            File_Name.Text = filename;
+            mediaPlayer.Open(new Uri(filename));
+            controls.Visibility = Visibility.Visible;
+            file_search.Visibility = Visibility.Hidden;
+            youtube_search.Visibility = Visibility.Hidden;
+            var tfile = TagLib.File.Create(filename);
+            song_title = tfile.Tag.Title;
+            song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
+            if (song_title.Length > 22)
             {
-                File_Name.Text = filename;
-                mediaPlayer.Open(new Uri(filename));
-                controls.Visibility = Visibility.Visible;
-                file_search.Visibility = Visibility.Hidden;
-                youtube_search.Visibility = Visibility.Hidden;
-                var tfile = TagLib.File.Create(filename);
-                song_title = tfile.Tag.Title;
-                song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
-                if (song_title.Length > 22)
-                {
-                    scroll_title = true;
-                    song_title = song_title + "    ";
-                    song_title_xaml.Text = song_title.Substring(0, 22);
-                }
-                else
-                {
-                    scroll_title = false;
-                    song_title_xaml.Text = song_title;
-                }
-                if (song_info.Length > 32)
-                {
-                    scroll_info = true;
-                    song_info = song_info + "    ";
-                    song_info_xaml.Text = song_info;
-                }
-                else
-                {
-                    scroll_info = false;
-                    song_info_xaml.Text = song_info;
-                }
+                scroll_title = true;
+                song_title = song_title + "    ";
+                song_title_xaml.Text = song_title.Substring(0, 22);
+            }
+            else
+            {
+                scroll_title = false;
+                song_title_xaml.Text = song_title;
+            }
+            if (song_info.Length > 32)
+            {
+                scroll_info = true;
+                song_info = song_info + "    ";
+                song_info_xaml.Text = song_info;
+            }
+            else
+            {
+                scroll_info = false;
+                song_info_xaml.Text = song_info;
             }
             Open_With_Play();
         }
@@ -260,6 +263,21 @@ namespace Desktop_Audio_Player
                 scroll_info = false;
                 song_info_xaml.Text = song_info;
             }
+            session = session_name.Text;
+            Debug.WriteLine(session);
+            if (session.Length > 0)
+            {
+                is_syncing = true;
+                sync_socket = new WebSocket("ws://172.105.47.207:8001/ws/audio/" + session + "/");
+                sync_socket.OnMessage += (sender, e) => Debug.WriteLine(e.Data);
+                sync_socket.OnOpen += (sender, e) => Debug.WriteLine("WebSocket Open");
+                sync_socket.OnClose += (sender, e) => Debug.WriteLine("WebSocket Close");
+            }
+        }
+
+        private void data_received(string data)
+        {
+            
         }
 
         private void BT_Click_Mute(object sender, RoutedEventArgs e)
