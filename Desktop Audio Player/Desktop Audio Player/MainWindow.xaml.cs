@@ -43,6 +43,8 @@ namespace Desktop_Audio_Player
         bool scroll_info = false;
         bool is_syncing = false;
         string session = "";
+        bool update_sync = false;
+        int updated_time = 0;
         WebSocket sync_socket;
         bool is_host = true;
         YoutubeClient youtube = new YoutubeClient();
@@ -92,7 +94,8 @@ namespace Desktop_Audio_Player
         private void slider_pressed(object sender, MouseButtonEventArgs e)
         {
             slider_clicked = true;
-            TimeSpan my_time = new TimeSpan(0, 0, 0, 0, (int)(((slider_timer.Value / 10) * totalTime)));
+            int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
+            TimeSpan my_time = new TimeSpan(0, 0, 0, 0, time_changed);
             mediaPlayer.Position = my_time;
             curr_time.Text = my_time.ToString("hh':'mm':'ss");
             slider_to_be_updated = true;
@@ -103,7 +106,8 @@ namespace Desktop_Audio_Player
         {
             if (slider_to_be_updated)
             {
-                TimeSpan my_time = new TimeSpan(0, 0, 0, 0, (int)(((slider_timer.Value / 10) * totalTime)));
+                int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
+                TimeSpan my_time = new TimeSpan(0, 0, 0, 0, time_changed);
                 mediaPlayer.Position = my_time;
                 slider_to_be_updated = false;
             }            
@@ -125,10 +129,30 @@ namespace Desktop_Audio_Player
 
         private void slider_unpressed(object sender, MouseButtonEventArgs e)
         {
-            TimeSpan my_time = new TimeSpan(0,0,0,0, (int)(((slider_timer.Value / 10) * totalTime )));
+            Dictionary<string, string> data;
+            string data_str = "";
+            int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
+            TimeSpan my_time = new TimeSpan(0, 0, 0, 0, time_changed);
             mediaPlayer.Position = my_time;
             curr_time.Text = my_time.ToString("hh':'mm':'ss");
             slider_clicked = false;
+            if (is_syncing)
+            {
+                if (is_host)
+                {
+                    data = new Dictionary<string, string>()
+                        {
+                            {"to_be_updated", "1"},
+                            {"position", time_changed.ToString()},
+                        };
+                    data = new Dictionary<string, string>()
+                        {
+                            {"message", JsonConvert.SerializeObject(data)}
+                        };
+                    data_str = JsonConvert.SerializeObject(data);
+                }
+                sync_socket.Send(data_str);
+            }
         }
 
         private void volume_changed(object sender, RoutedEventArgs e)
@@ -271,19 +295,47 @@ namespace Desktop_Audio_Player
                 sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
                 sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
                 sync_socket.Open();
+                sync_socket.Send("data");
             }
         }
+
 
         private void data_received(object sender, MessageReceivedEventArgs e)
         {
             var obj = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.Message);
             try
             {
-                Debug.WriteLine(obj["host"]);
+                Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(obj["message"]);
+                foreach (KeyValuePair<string, string> kvp in data)
+                {
+                    //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                    Debug.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                }
+                if (!is_host)
+                {
+                    if (data["to_be_updated"] == "1")
+                    {
+                        slider_to_be_updated = true;
+                        Debug.WriteLine("before parse");
+                        int time_changed = int.Parse(data["position"]);
+                        Debug.WriteLine("before set");
+                        update_sync = true;
+                        updated_time = time_changed;
+                        Debug.WriteLine("after set");
+                        slider_to_be_updated = false;
+                    }
+                }
             }
             catch
             {
-                Debug.WriteLine(e.Message);
+                if (obj["host"] == "true")
+                {
+                    is_host = true;
+                }
+                else
+                {
+                    is_host = false;
+                }
             }
         }
 
@@ -347,6 +399,12 @@ namespace Desktop_Audio_Player
                     {
                         Debug.WriteLine(e1.Message);
                     }
+                }
+                if (update_sync)
+                {
+                    TimeSpan my_time = new TimeSpan(0, 0, 0, 0, updated_time);
+                    mediaPlayer.Position = my_time;
+                    curr_time.Text = mediaPlayer.Position.ToString("hh':'mm':'ss");
                 }
                 var progress_per = mediaPlayer.Position.TotalMilliseconds / totalTime * 10;
                 slider_timer.Value = progress_per;
