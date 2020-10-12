@@ -18,7 +18,8 @@ using System.Diagnostics;
 using System.Xml.Schema;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
-using WebSocketSharp;
+using WebSocket4Net;
+using Newtonsoft.Json;
 
 namespace Desktop_Audio_Player
 {
@@ -264,20 +265,26 @@ namespace Desktop_Audio_Player
                 song_info_xaml.Text = song_info;
             }
             session = session_name.Text;
-            Debug.WriteLine(session);
             if (session.Length > 0)
             {
                 is_syncing = true;
-                sync_socket = new WebSocket("ws://172.105.47.207:8001/ws/audio/" + session + "/");
-                sync_socket.OnMessage += (sender, e) => Debug.WriteLine(e.Data);
-                sync_socket.OnOpen += (sender, e) => Debug.WriteLine("WebSocket Open");
-                sync_socket.OnClose += (sender, e) => Debug.WriteLine("WebSocket Close");
+                sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
+                sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
+                sync_socket.Open();
             }
         }
 
-        private void data_received(string data)
+        private void data_received(object sender, MessageReceivedEventArgs e)
         {
-            
+            var obj = JsonConvert.DeserializeObject<Dictionary<string, string>>(e.Message);
+            try
+            {
+                Debug.WriteLine(obj["host"]);
+            }
+            catch
+            {
+                Debug.WriteLine(e.Message);
+            }
         }
 
         private void BT_Click_Mute(object sender, RoutedEventArgs e)
