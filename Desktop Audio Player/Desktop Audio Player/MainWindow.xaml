@@ -100,7 +100,7 @@
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock x:Name="song_title_xaml" Text="Song Titleasdasdsaddsa" TextAlignment="Center" FontWeight="ExtraBold" FontSize="20" FontFamily="Ink Free" Width="200"></TextBlock>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock x:Name="song_info_xaml" Text="Album Artistsadsasddasdaasdasdss" TextAlignment="Center" FontWeight="Bold" Width="200"></TextBlock>
+                                <TextBlock x:Name="song_info_xaml" Text="Album Artistsacsasddasdaasdasdss" TextAlignment="Center" FontWeight="Bold" Width="200"></TextBlock>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
