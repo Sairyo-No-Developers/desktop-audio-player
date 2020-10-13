@@ -36,7 +36,7 @@ Sairyö No Player has the framework self-contained in it and thus requires no ex
 License
 ----
 
-MIT
+BSD 3-Clause
 
 
-**Free Software For Now, Hell Yeah!**
+**Free Software To Use For Now, Hell Yeah!**
