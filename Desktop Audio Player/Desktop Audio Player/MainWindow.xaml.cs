@@ -45,8 +45,10 @@ namespace Desktop_Audio_Player
         string session = "";
         bool update_sync = false;
         int updated_time = 0;
+        string is_playing = "0";
+        string last_is_playing = "0";
         WebSocket sync_socket;
-        bool is_host = true;
+        bool is_host = false;
         YoutubeClient youtube = new YoutubeClient();
         public MainWindow(bool open_with, string filename = "") {
             InitializeComponent();
@@ -115,7 +117,7 @@ namespace Desktop_Audio_Player
 
         private void play_pause(object sender, RoutedEventArgs e)
         {
-            if (play_not_pause)
+            if (is_playing == "0")
             {
                 BT_Click_Play(sender, e);
                 play_not_pause = false;
@@ -136,21 +138,19 @@ namespace Desktop_Audio_Player
             mediaPlayer.Position = my_time;
             curr_time.Text = my_time.ToString("hh':'mm':'ss");
             slider_clicked = false;
-            if (is_syncing)
+            if (is_host)
             {
-                if (is_host)
-                {
-                    data = new Dictionary<string, string>()
+                data = new Dictionary<string, string>()
                         {
+                            {"is_playing", is_playing },
                             {"to_be_updated", "1"},
                             {"position", time_changed.ToString()},
                         };
-                    data = new Dictionary<string, string>()
+                data = new Dictionary<string, string>()
                         {
                             {"message", JsonConvert.SerializeObject(data)}
                         };
-                    data_str = JsonConvert.SerializeObject(data);
-                }
+                data_str = JsonConvert.SerializeObject(data);
                 sync_socket.Send(data_str);
             }
         }
@@ -184,6 +184,7 @@ namespace Desktop_Audio_Player
             controls.Visibility = Visibility.Visible;
             file_search.Visibility = Visibility.Hidden;
             youtube_search.Visibility = Visibility.Hidden;
+            sync_bar.Visibility = Visibility.Collapsed;
             var tfile = TagLib.File.Create(filename);
             song_title = tfile.Tag.Title;
             song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
@@ -226,6 +227,7 @@ namespace Desktop_Audio_Player
                 controls.Visibility = Visibility.Visible;
                 file_search.Visibility = Visibility.Hidden;
                 youtube_search.Visibility = Visibility.Hidden;
+                sync_bar.Visibility = Visibility.Collapsed;
                 var tfile = TagLib.File.Create(filename);
                 song_title = tfile.Tag.Title;
                 song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
@@ -251,6 +253,7 @@ namespace Desktop_Audio_Player
                     scroll_info = false;
                     song_info_xaml.Text = song_info;
                 }
+                Open_With_Play();
             }
         }
 
@@ -264,6 +267,7 @@ namespace Desktop_Audio_Player
             controls.Visibility = Visibility.Visible;
             file_search.Visibility = Visibility.Hidden;
             youtube_search.Visibility = Visibility.Hidden;
+            sync_bar.Visibility = Visibility.Collapsed;
             song_title = video_data.Title;
             song_info = video_data.Author + " - " + video_data.UploadDate.ToString("MM/dd/yyyy");
             if (song_title.Length > 22)
@@ -297,6 +301,7 @@ namespace Desktop_Audio_Player
                 sync_socket.Open();
                 sync_socket.Send("data");
             }
+            Open_With_Play();
         }
 
 
@@ -323,6 +328,7 @@ namespace Desktop_Audio_Player
                         updated_time = time_changed;
                         Debug.WriteLine("after set");
                         slider_to_be_updated = false;
+                        is_playing = data["is_playing"];
                     }
                 }
             }
@@ -359,16 +365,33 @@ namespace Desktop_Audio_Player
             }
         }
 
+
         private void BT_Click_Play(object sender, RoutedEventArgs e)
-        { 
+        {
+            Dictionary<string, string> data;
+            string data_str = "";
+            int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
             mediaPlayer.Play();
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(500);
-            timer.Tick += timer_Tick;
-            timer.Start();
             file_search.Visibility = Visibility.Hidden;
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
             mediaPlayer.Volume = volume;
+            is_playing = "1";
+            last_is_playing = "1";
+            if (is_host)
+            {
+                data = new Dictionary<string, string>()
+                        {
+                            {"is_playing", is_playing },
+                            {"to_be_updated", "1"},
+                            {"position", time_changed.ToString()},
+                        };
+                data = new Dictionary<string, string>()
+                        {
+                            {"message", JsonConvert.SerializeObject(data)}
+                        };
+                data_str = JsonConvert.SerializeObject(data);
+                sync_socket.Send(data_str);
+            }
         }
 
         private void Open_With_Play()
@@ -381,6 +404,8 @@ namespace Desktop_Audio_Player
             file_search.Visibility = Visibility.Hidden;
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
             mediaPlayer.Volume = volume;
+            is_playing = "1";
+            last_is_playing = "1";
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -400,13 +425,33 @@ namespace Desktop_Audio_Player
                         Debug.WriteLine(e1.Message);
                     }
                 }
-                if (update_sync)
+                if (is_syncing)
                 {
-                    TimeSpan my_time = new TimeSpan(0, 0, 0, 0, updated_time);
-                    mediaPlayer.Position = my_time;
-                    curr_time.Text = mediaPlayer.Position.ToString("hh':'mm':'ss");
-                    update_sync = false;
-                }
+                    if (!is_host)
+                    {
+                        if (update_sync)
+                        {
+                            TimeSpan my_time = new TimeSpan(0, 0, 0, 0, updated_time);
+                            mediaPlayer.Position = my_time;
+                            curr_time.Text = mediaPlayer.Position.ToString("hh':'mm':'ss");
+                            update_sync = false;
+                            if (is_playing != last_is_playing)
+                            {
+                                last_is_playing = is_playing;
+                                if (is_playing == "1")
+                                {
+                                    mediaPlayer.Play();
+                                    play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
+                                }
+                                else
+                                {
+                                    mediaPlayer.Pause();
+                                    play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
+                                }
+                            }
+                        }
+                    }
+                }                
                 var progress_per = mediaPlayer.Position.TotalMilliseconds / totalTime * 10;
                 slider_timer.Value = progress_per;
                 curr_time.Text = mediaPlayer.Position.ToString("hh':'mm':'ss");
@@ -422,9 +467,29 @@ namespace Desktop_Audio_Player
 
         private void BT_Click_Pause(object sender, RoutedEventArgs e)
         {
+            Dictionary<string, string> data;
+            string data_str = "";
+            int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
             mediaPlayer.Pause();
             file_search.Visibility = Visibility.Hidden;
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
+            is_playing = "0";
+            last_is_playing = "0";
+            if (is_host)
+            {
+                data = new Dictionary<string, string>()
+                        {
+                            {"is_playing", is_playing },
+                            {"to_be_updated", "1"},
+                            {"position", time_changed.ToString()},
+                        };
+                data = new Dictionary<string, string>()
+                        {
+                            {"message", JsonConvert.SerializeObject(data)}
+                        };
+                data_str = JsonConvert.SerializeObject(data);
+                sync_socket.Send(data_str);
+            }
         }
 
         private void BT_Click_Win_Close(object sender, RoutedEventArgs e)
@@ -447,6 +512,7 @@ namespace Desktop_Audio_Player
             controls.Visibility = Visibility.Hidden;
             file_search.Visibility = Visibility.Visible;
             youtube_search.Visibility = Visibility.Visible;
+            sync_bar.Visibility = Visibility.Visible;
             curr_time.Text = "--:--:--";
             final_time.Text = "--:--:--";
             play_not_pause = true;
