@@ -405,6 +405,7 @@ namespace Desktop_Audio_Player
                     TimeSpan my_time = new TimeSpan(0, 0, 0, 0, updated_time);
                     mediaPlayer.Position = my_time;
                     curr_time.Text = mediaPlayer.Position.ToString("hh':'mm':'ss");
+                    update_sync = false;
                 }
                 var progress_per = mediaPlayer.Position.TotalMilliseconds / totalTime * 10;
                 slider_timer.Value = progress_per;
