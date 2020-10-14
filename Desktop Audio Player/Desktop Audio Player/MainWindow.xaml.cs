@@ -176,6 +176,7 @@ namespace Desktop_Audio_Player
             timer.Interval = TimeSpan.FromMilliseconds(500);
             timer.Tick += timer_Tick;
             timer.Start();
+            Clipboard.SetText(session);
         }
 
         private void session_opened(object sender, EventArgs e)
