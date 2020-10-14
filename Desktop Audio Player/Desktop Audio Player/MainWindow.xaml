@@ -16,6 +16,9 @@
                 <materialDesign:PackIcon Kind="WindowClose" Height="15" Width="15" Foreground="White"/>
             </Button>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <TextBlock x:Name="session_id_xaml" Text="Session ID: " Margin="10,5,0,0"/>
+        </StackPanel>
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,0,0,0">
                 <TextBlock Style="{DynamicResource MaterialDesignHeadline2TextBlock}" Text="Sairyö No Player" TextAlignment="Center" Margin="0,0,0,10"/>
@@ -52,11 +55,24 @@
                 <materialDesign:Card x:Name="sync_bar" Padding="10,5,10,2" Visibility="Visible">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock Foreground="White" Text="Sync Session  :" FontSize="22"/>
-                        <TextBox x:Name="session_name" FontSize="22" Width="331" Margin="10,0,0,0"/>
+                        <TextBox x:Name="session_name" FontSize="22" Width="262" Margin="10,0,0,0"/>
+                        <Button x:Name="join_session" Content="Join" Foreground="white" Width="60" Click="join_session_func" Margin="10,0,0,0" Padding="10,0,10,0">
+                            <Button.Background>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#12c2e9" Offset="0.0"/>
+                                    <GradientStop Color="#c471ed" Offset="0.5"/>
+                                    <GradientStop Color="#f64f59" Offset="1.0"/>
+                                </LinearGradientBrush>
+                            </Button.Background>
+                        </Button>
                     </StackPanel>
                 </materialDesign:Card>
+                <StackPanel x:Name="session_controls" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="session_create" Style="{DynamicResource MaterialDesignRaisedButton}" Foreground="white" Margin="0,10,5,0" Click="create_session">Create</Button>
+                    <Button x:Name="session_join" Style="{DynamicResource MaterialDesignRaisedAccentButton}" Margin="5,10,0,0" Foreground="White" Click="session_join_func">Join</Button>
+                </StackPanel>
             </StackPanel>
-            <StackPanel x:Name="controls" Visibility="Visible" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+            <StackPanel x:Name="controls" Visibility="Collapsed" Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                 <Grid Margin="0,0,0,10">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock x:Name="curr_time" Text="--:--:--" Margin="0,0,10,0" FontSize="15" />

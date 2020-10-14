@@ -33,7 +33,6 @@ namespace Desktop_Audio_Player
         bool slider_clicked = false;
         double totalTime = 1.0;
         bool is_total_time_set = false;
-        bool play_not_pause = true;
         double volume = 1.0;
         bool is_muted = false;
         bool slider_to_be_updated = false;
@@ -42,9 +41,12 @@ namespace Desktop_Audio_Player
         bool scroll_title = false;
         bool scroll_info = false;
         bool is_syncing = false;
+        string session_id = "";
         string session = "";
         bool update_sync = false;
         int updated_time = 0;
+        string youtube_url_link = "";
+        string old_youtube_url_link = "";
         string is_playing = "0";
         string last_is_playing = "0";
         WebSocket sync_socket;
@@ -54,7 +56,10 @@ namespace Desktop_Audio_Player
             InitializeComponent();
             file_search.Visibility = Visibility.Visible;
             youtube_search.Visibility = Visibility.Visible;
+            sync_bar.Visibility = Visibility.Collapsed;
             controls.Visibility = Visibility.Hidden;
+            session_id_xaml.Visibility = Visibility.Hidden;
+            session_controls.Visibility = Visibility.Visible;
             MouseDown += Window_MouseDown;
             slider_timer.AddHandler(MouseLeftButtonDownEvent,
                       new MouseButtonEventHandler(slider_pressed),
@@ -103,6 +108,133 @@ namespace Desktop_Audio_Player
             slider_to_be_updated = true;
         }
 
+        async private void create_session(object sender, RoutedEventArgs e)
+        {
+            string url_to = url_youtube.Text;
+            var video_data = await youtube.Videos.GetAsync(url_to);
+            var video = await youtube.Videos.Streams.GetManifestAsync(url_to);
+            var audio = video.GetAudioOnly().WithHighestBitrate();
+            youtube_url_link = url_to;
+            old_youtube_url_link = url_to;
+            mediaPlayer.Open(new Uri(audio.Url));
+            controls.Visibility = Visibility.Visible;
+            file_search.Visibility = Visibility.Hidden;
+            youtube_search.Visibility = Visibility.Hidden;
+            sync_bar.Visibility = Visibility.Collapsed;
+            song_title = video_data.Title;
+            song_info = video_data.Author + " - " + video_data.UploadDate.ToString("MM/dd/yyyy");
+            if (song_title.Length > 22)
+            {
+                scroll_title = true;
+                song_title = song_title + "    ";
+                song_title_xaml.Text = song_title.Substring(0, 22);
+            }
+            else
+            {
+                scroll_title = false;
+                song_title_xaml.Text = song_title;
+            }
+            if (song_info.Length > 32)
+            {
+                scroll_info = true;
+                song_info = song_info + "    ";
+                song_info_xaml.Text = song_info;
+            }
+            else
+            {
+                scroll_info = false;
+                song_info_xaml.Text = song_info;
+            }
+
+            int length = 10;
+            StringBuilder str_build = new StringBuilder();  
+            Random random = new Random();  
+
+            char letter;  
+
+            for (int i = 0; i < length; i++)
+            {
+            double flt = random.NextDouble();
+            int shift = Convert.ToInt32(Math.Floor(25 * flt));
+            letter = Convert.ToChar(shift + 97);
+            str_build.Append(letter);  
+            }  
+            Debug.WriteLine(str_build.ToString());
+            session = str_build.ToString();
+            session_id = session;
+            session_id_xaml.Text = "Session ID : " + session;
+            session_id_xaml.Visibility = Visibility.Visible;
+            session_controls.Visibility = Visibility.Collapsed;
+            is_syncing = true;
+            sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
+            sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
+            sync_socket.Opened += new EventHandler(session_opened);
+            sync_socket.Open();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Tick += timer_Tick;
+            timer.Start();
+        }
+
+        private void session_opened(object sender, EventArgs e)
+        {
+            Dictionary<string, string> data;
+            string data_str;
+            data = new Dictionary<string, string>()
+                        {
+                            {"is_host", "1" },
+                            {"is_playing", is_playing },
+                            {"to_be_updated", "1"},
+                            {"media_url", youtube_url_link },
+                        };
+            data = new Dictionary<string, string>()
+                        {
+                            {"message", JsonConvert.SerializeObject(data)}
+                        };
+            data_str = JsonConvert.SerializeObject(data);
+            sync_socket.Send(data_str);
+        }
+
+        private void session_play()
+        {
+            mediaPlayer.Play();
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Tick += timer_Tick;
+            timer.Start();
+            file_search.Visibility = Visibility.Hidden;
+            play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
+            mediaPlayer.Volume = volume;
+            is_playing = "1";
+            last_is_playing = "1";
+        }
+
+        private void session_join_func(object sender, RoutedEventArgs e)
+        {
+            file_search.Visibility = Visibility.Hidden;
+            youtube_search.Visibility = Visibility.Hidden;
+            sync_bar.Visibility = Visibility.Visible;
+            session_controls.Visibility = Visibility.Collapsed;
+        }
+
+        private void join_session_func(object sender, RoutedEventArgs e)
+        {
+            session_id = session_name.Text;
+            session = session_id;
+            session_id_xaml.Text = "Session ID : " + session_id;
+            session_id_xaml.Visibility = Visibility.Visible;
+            session_controls.Visibility = Visibility.Collapsed;
+            is_syncing = true;
+            sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
+            sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
+            sync_socket.Open();
+            controls.Visibility = Visibility.Visible;
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Tick += timer_Tick;
+            timer.Start();
+            sync_bar.Visibility = Visibility.Collapsed;
+        }
 
         private void slider_changed(object sender, RoutedEventArgs e)
         {
@@ -120,12 +252,10 @@ namespace Desktop_Audio_Player
             if (is_playing == "0")
             {
                 BT_Click_Play(sender, e);
-                play_not_pause = false;
             }
             else
             {
                 BT_Click_Pause(sender, e);
-                play_not_pause = true;
             }
         }
 
@@ -142,8 +272,10 @@ namespace Desktop_Audio_Player
             {
                 data = new Dictionary<string, string>()
                         {
+                            {"is_host", "1" },
                             {"is_playing", is_playing },
                             {"to_be_updated", "1"},
+                            {"media_url", youtube_url_link },
                             {"position", time_changed.ToString()},
                         };
                 data = new Dictionary<string, string>()
@@ -260,6 +392,7 @@ namespace Desktop_Audio_Player
         async private void BT_Click_Open_Youtube(object sender, RoutedEventArgs e)
         {
             string url_to = url_youtube.Text;
+            youtube_url_link = url_to;
             var video_data = await youtube.Videos.GetAsync(url_to);
             var video = await youtube.Videos.Streams.GetManifestAsync(url_to);
             var audio = video.GetAudioOnly().WithHighestBitrate();
@@ -340,6 +473,7 @@ namespace Desktop_Audio_Player
                 }
                 else
                 {
+                    youtube_url_link = obj["media_url"];
                     is_host = false;
                 }
             }
@@ -381,7 +515,9 @@ namespace Desktop_Audio_Player
             {
                 data = new Dictionary<string, string>()
                         {
+                            {"is_host", "1" },
                             {"is_playing", is_playing },
+                            {"media_url", youtube_url_link },
                             {"to_be_updated", "1"},
                             {"position", time_changed.ToString()},
                         };
@@ -429,6 +565,20 @@ namespace Desktop_Audio_Player
                 {
                     if (!is_host)
                     {
+                        if (youtube_url_link != old_youtube_url_link)
+                        {
+                            try
+                            {
+                                mediaPlayer.Stop();
+                                mediaPlayer.Open(new Uri(youtube_url_link));
+                                old_youtube_url_link = youtube_url_link;
+                            }
+                            catch
+                            {
+
+                            }
+                            
+                        }
                         if (update_sync)
                         {
                             TimeSpan my_time = new TimeSpan(0, 0, 0, 0, updated_time);
@@ -479,7 +629,9 @@ namespace Desktop_Audio_Player
             {
                 data = new Dictionary<string, string>()
                         {
+                            {"is_host", "1" },
                             {"is_playing", is_playing },
+                            {"media_url", youtube_url_link },
                             {"to_be_updated", "1"},
                             {"position", time_changed.ToString()},
                         };
@@ -512,10 +664,11 @@ namespace Desktop_Audio_Player
             controls.Visibility = Visibility.Hidden;
             file_search.Visibility = Visibility.Visible;
             youtube_search.Visibility = Visibility.Visible;
-            sync_bar.Visibility = Visibility.Visible;
+            sync_bar.Visibility = Visibility.Collapsed;
             curr_time.Text = "--:--:--";
             final_time.Text = "--:--:--";
-            play_not_pause = true;
+            is_playing = "0";
+            last_is_playing = "0";
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
             is_total_time_set = false;
             slider_to_be_updated = false;
