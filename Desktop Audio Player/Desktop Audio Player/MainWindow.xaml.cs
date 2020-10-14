@@ -51,6 +51,7 @@ namespace Desktop_Audio_Player
         string last_is_playing = "0";
         WebSocket sync_socket;
         bool is_host = false;
+        bool request_update = false;
         YoutubeClient youtube = new YoutubeClient();
         public MainWindow(bool open_with, string filename = "") {
             InitializeComponent();
@@ -114,9 +115,9 @@ namespace Desktop_Audio_Player
             var video_data = await youtube.Videos.GetAsync(url_to);
             var video = await youtube.Videos.Streams.GetManifestAsync(url_to);
             var audio = video.GetAudioOnly().WithHighestBitrate();
-            youtube_url_link = url_to;
-            old_youtube_url_link = url_to;
             mediaPlayer.Open(new Uri(audio.Url));
+            youtube_url_link = audio.Url;
+            old_youtube_url_link = audio.Url;
             controls.Visibility = Visibility.Visible;
             file_search.Visibility = Visibility.Hidden;
             youtube_search.Visibility = Visibility.Hidden;
@@ -166,6 +167,7 @@ namespace Desktop_Audio_Player
             session_id_xaml.Visibility = Visibility.Visible;
             session_controls.Visibility = Visibility.Collapsed;
             is_syncing = true;
+            is_host = true;
             sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
             sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
             sync_socket.Opened += new EventHandler(session_opened);
@@ -227,6 +229,7 @@ namespace Desktop_Audio_Player
             is_syncing = true;
             sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
             sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
+            sync_socket.Opened += new EventHandler(session_joined_client);
             sync_socket.Open();
             controls.Visibility = Visibility.Visible;
             DispatcherTimer timer = new DispatcherTimer();
@@ -234,6 +237,25 @@ namespace Desktop_Audio_Player
             timer.Tick += timer_Tick;
             timer.Start();
             sync_bar.Visibility = Visibility.Collapsed;
+        }
+
+        private void session_joined_client(object sender, EventArgs e)
+        {
+            Dictionary<string, string> data;
+            string data_str;
+            data = new Dictionary<string, string>()
+                        {
+                            {"is_host", "0" },
+                            {"is_playing", is_playing },
+                            {"to_be_updated", "0"},
+                            {"request_update", "1" },
+                        };
+            data = new Dictionary<string, string>()
+                        {
+                            {"message", JsonConvert.SerializeObject(data)}
+                        };
+            data_str = JsonConvert.SerializeObject(data);
+            sync_socket.Send(data_str);
         }
 
         private void slider_changed(object sender, RoutedEventArgs e)
@@ -437,6 +459,26 @@ namespace Desktop_Audio_Player
             Open_With_Play();
         }
 
+        private void update_clients()
+        {
+            Dictionary<string, string> data1;
+            string data_str;
+            int time_changed = (int)(((slider_timer.Value / 10) * totalTime));
+            data1 = new Dictionary<string, string>()
+                            {
+                                {"is_host", "1" },
+                                {"is_playing", is_playing },
+                                {"to_be_updated", "1"},
+                                {"position", time_changed.ToString()},
+                                {"media_url", youtube_url_link },
+                            };
+            data1 = new Dictionary<string, string>()
+                            {
+                                {"message", JsonConvert.SerializeObject(data1)}
+                            };
+            data_str = JsonConvert.SerializeObject(data1);
+            sync_socket.Send(data_str);
+        }
 
         private void data_received(object sender, MessageReceivedEventArgs e)
         {
@@ -444,11 +486,6 @@ namespace Desktop_Audio_Player
             try
             {
                 Dictionary<string, string> data = JsonConvert.DeserializeObject<Dictionary<string, string>>(obj["message"]);
-                foreach (KeyValuePair<string, string> kvp in data)
-                {
-                    //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                    Debug.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
-                }
                 if (!is_host)
                 {
                     if (data["to_be_updated"] == "1")
@@ -464,9 +501,30 @@ namespace Desktop_Audio_Player
                         is_playing = data["is_playing"];
                     }
                 }
+                else
+                {
+                    foreach (KeyValuePair<string, string> kvp in data)
+                    {
+                        //textBox3.Text += ("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                        Debug.WriteLine("Key = {0}, Value = {1}", kvp.Key, kvp.Value);
+                    }
+                    try
+                    {
+                        if (data["request_update"] == "1")
+                        {
+                            Debug.WriteLine("update requested");
+                            request_update = true;
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
             }
             catch
             {
+                Debug.WriteLine(obj["host"]);
                 if (obj["host"] == "true")
                 {
                     is_host = true;
@@ -599,6 +657,14 @@ namespace Desktop_Audio_Player
                                     play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
                                 }
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (request_update)
+                        {
+                            update_clients();
+                            request_update = false;
                         }
                     }
                 }                

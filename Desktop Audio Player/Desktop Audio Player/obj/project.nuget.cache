@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KpwQYzFH+Py8EBI2VzLLRMB1qvAh5u/1F8onhWEJ0U4uGu2WVG2XB0vYuoBCOQxKJcxmRNV/WORNmnAvVemfZQ==",
+  "dgSpecHash": "ju5m29Jx3XZPDrwmZIFtONgYWa7cmnd6kxuJ7DuLPQue/NX6CjwrxFP/ZqH6DNU2addqNK0Ye75KF/UAiB2S/w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
+  "projectFilePath": "C:\\Users\\Abhishek Adhikari\\source\\repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\anglesharp\\0.14.0\\anglesharp.0.14.0.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\materialdesigncolors\\1.2.7\\materialdesigncolors.1.2.7.nupkg.sha512",
