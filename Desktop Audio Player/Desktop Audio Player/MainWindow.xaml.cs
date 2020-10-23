@@ -95,7 +95,6 @@ namespace Desktop_Audio_Player
             {
                 song_info = song_info.Substring(1, song_info.Length - 1) + song_info.Substring(0, 1);
                 song_info_xaml.Text = song_info.Substring(0, 32);
-                Debug.WriteLine(song_info);
             }
         }
 
@@ -189,6 +188,8 @@ namespace Desktop_Audio_Player
                             {"is_playing", is_playing },
                             {"to_be_updated", "1"},
                             {"media_url", youtube_url_link },
+                            {"song_title", song_title },
+                            {"song_info", song_info },
                         };
             data = new Dictionary<string, string>()
                         {
@@ -196,6 +197,32 @@ namespace Desktop_Audio_Player
                         };
             data_str = JsonConvert.SerializeObject(data);
             sync_socket.Send(data_str);
+        }
+
+        private void update_song_info()
+        {
+            if (song_title.Length > 22)
+            {
+                scroll_title = true;
+                song_title = song_title + "    ";
+                song_title_xaml.Text = song_title.Substring(0, 22);
+            }
+            else
+            {
+                scroll_title = false;
+                song_title_xaml.Text = song_title;
+            }
+            if (song_info.Length > 32)
+            {
+                scroll_info = true;
+                song_info = song_info + "    ";
+                song_info_xaml.Text = song_info;
+            }
+            else
+            {
+                scroll_info = false;
+                song_info_xaml.Text = song_info;
+            }
         }
 
         private void session_play()
@@ -300,6 +327,8 @@ namespace Desktop_Audio_Player
                             {"to_be_updated", "1"},
                             {"media_url", youtube_url_link },
                             {"position", time_changed.ToString()},
+                            {"song_title", song_title },
+                            {"song_info", song_info },
                         };
                 data = new Dictionary<string, string>()
                         {
@@ -415,11 +444,11 @@ namespace Desktop_Audio_Player
         async private void BT_Click_Open_Youtube(object sender, RoutedEventArgs e)
         {
             string url_to = url_youtube.Text;
-            youtube_url_link = url_to;
             var video_data = await youtube.Videos.GetAsync(url_to);
             var video = await youtube.Videos.Streams.GetManifestAsync(url_to);
             var audio = video.GetAudioOnly().WithHighestBitrate();
             mediaPlayer.Open(new Uri(audio.Url));
+            youtube_url_link = audio.Url;
             controls.Visibility = Visibility.Visible;
             file_search.Visibility = Visibility.Hidden;
             youtube_search.Visibility = Visibility.Hidden;
@@ -448,16 +477,14 @@ namespace Desktop_Audio_Player
                 scroll_info = false;
                 song_info_xaml.Text = song_info;
             }
-            session = session_name.Text;
-            if (session.Length > 0)
+            if (session_id.Length > 0)
             {
-                is_syncing = true;
-                sync_socket = new WebSocket("wss://socket.sairyonodevs.in/ws/audio/" + session + "/");
-                sync_socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(data_received);
-                sync_socket.Open();
-                sync_socket.Send("data");
+                update_clients();
             }
-            Open_With_Play();
+            else
+            {
+                Open_With_Play();
+            }
         }
 
         private void update_clients()
@@ -472,6 +499,8 @@ namespace Desktop_Audio_Player
                                 {"to_be_updated", "1"},
                                 {"position", time_changed.ToString()},
                                 {"media_url", youtube_url_link },
+                                {"song_title", song_title },
+                                {"song_info", song_info },
                             };
             data1 = new Dictionary<string, string>()
                             {
@@ -500,6 +529,9 @@ namespace Desktop_Audio_Player
                         Debug.WriteLine("after set");
                         slider_to_be_updated = false;
                         is_playing = data["is_playing"];
+                        youtube_url_link = data["media_url"];
+                        song_title = data["song_title"];
+                        song_info = data["song_info"];
                     }
                 }
                 else
@@ -579,6 +611,8 @@ namespace Desktop_Audio_Player
                             {"media_url", youtube_url_link },
                             {"to_be_updated", "1"},
                             {"position", time_changed.ToString()},
+                            {"song_title", song_title },
+                            {"song_info", song_info },
                         };
                 data = new Dictionary<string, string>()
                         {
@@ -589,6 +623,7 @@ namespace Desktop_Audio_Player
             }
         }
 
+
         private void Open_With_Play()
         {
             mediaPlayer.Play();
@@ -597,6 +632,7 @@ namespace Desktop_Audio_Player
             timer.Tick += timer_Tick;
             timer.Start();
             file_search.Visibility = Visibility.Hidden;
+            session_controls.Visibility = Visibility.Collapsed;
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Pause;
             mediaPlayer.Volume = volume;
             is_playing = "1";
@@ -631,6 +667,8 @@ namespace Desktop_Audio_Player
                                 mediaPlayer.Stop();
                                 mediaPlayer.Open(new Uri(youtube_url_link));
                                 old_youtube_url_link = youtube_url_link;
+                                is_total_time_set = false;
+                                update_song_info();
                             }
                             catch
                             {
@@ -658,6 +696,12 @@ namespace Desktop_Audio_Player
                                     play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
                                 }
                             }
+                            Debug.WriteLine(song_info);
+                            Debug.WriteLine(song_info.Length);
+                            if (song_info.Length > 0)
+                            {
+                                update_song_info();
+                            }
                         }
                     }
                     else
@@ -680,6 +724,7 @@ namespace Desktop_Audio_Player
             TimeSpan my_time = new TimeSpan(0, 0, 0, 0, 0);
             mediaPlayer.Position = my_time;
             curr_time.Text = my_time.ToString("hh':'mm':'ss");
+            update_clients();
         }
 
         private void BT_Click_Pause(object sender, RoutedEventArgs e)
@@ -701,6 +746,8 @@ namespace Desktop_Audio_Player
                             {"media_url", youtube_url_link },
                             {"to_be_updated", "1"},
                             {"position", time_changed.ToString()},
+                            {"song_title", song_title },
+                            {"song_info", song_info },
                         };
                 data = new Dictionary<string, string>()
                         {
@@ -729,13 +776,17 @@ namespace Desktop_Audio_Player
             url_youtube.Text = "";
             mediaPlayer.Close();
             controls.Visibility = Visibility.Hidden;
-            file_search.Visibility = Visibility.Visible;
+            if (!is_syncing)
+            {
+                file_search.Visibility = Visibility.Visible;
+            }
             youtube_search.Visibility = Visibility.Visible;
             sync_bar.Visibility = Visibility.Collapsed;
             curr_time.Text = "--:--:--";
             final_time.Text = "--:--:--";
             is_playing = "0";
             last_is_playing = "0";
+            update_clients();
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
             is_total_time_set = false;
             slider_to_be_updated = false;
