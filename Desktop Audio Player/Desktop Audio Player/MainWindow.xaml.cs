@@ -414,7 +414,7 @@ namespace Desktop_Audio_Player
                 sync_bar.Visibility = Visibility.Collapsed;
                 var tfile = TagLib.File.Create(filename);
                 song_title = tfile.Tag.Title;
-                song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.JoinedPerformers;
+                song_info = tfile.Tag.JoinedPerformers + " - " + tfile.Tag.Album;
                 if (song_title.Length > 22)
                 {
                     scroll_title = true;
@@ -724,7 +724,13 @@ namespace Desktop_Audio_Player
             TimeSpan my_time = new TimeSpan(0, 0, 0, 0, 0);
             mediaPlayer.Position = my_time;
             curr_time.Text = my_time.ToString("hh':'mm':'ss");
-            update_clients();
+            if (is_syncing)
+            {
+                if (is_host)
+                {
+                    update_clients();
+                }
+            }
         }
 
         private void BT_Click_Pause(object sender, RoutedEventArgs e)
@@ -786,7 +792,13 @@ namespace Desktop_Audio_Player
             final_time.Text = "--:--:--";
             is_playing = "0";
             last_is_playing = "0";
-            update_clients();
+            if (is_syncing)
+            {
+                if (is_host)
+                {
+                    update_clients();
+                }
+            }
             play_pause_button.Kind = MaterialDesignThemes.Wpf.PackIconKind.Play;
             is_total_time_set = false;
             slider_to_be_updated = false;
