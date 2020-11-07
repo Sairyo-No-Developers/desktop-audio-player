@@ -56,7 +56,7 @@
             },
             "YoutubeExplode": {
               "target": "Package",
-              "version": "[5.1.6, )"
+              "version": "[5.1.8, )"
             },
             "taglib-sharp-netstandard2.0": {
               "target": "Package",

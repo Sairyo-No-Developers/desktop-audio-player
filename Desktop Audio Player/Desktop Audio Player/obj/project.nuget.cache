@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "KpwQYzFH+Py8EBI2VzLLRMB1qvAh5u/1F8onhWEJ0U4uGu2WVG2XB0vYuoBCOQxKJcxmRNV/WORNmnAvVemfZQ==",
+  "dgSpecHash": "PwShBCwO2IUaezRcgyOaYYNv2LH2LIsQs9cAQXJOHnsFmbXAkMbrMvToLTJvlNavRUqiNRZBJY7u8CZs4QylGQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\Abhishek Adhikari\\Source\\Repos\\Sairyo-No-Developers\\desktop-audio-player\\Desktop Audio Player\\Desktop Audio Player\\Desktop Audio Player.csproj",
   "expectedPackageFiles": [
@@ -74,7 +74,7 @@
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\taglib-sharp-netstandard2.0\\2.1.0\\taglib-sharp-netstandard2.0.2.1.0.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\websocket4net\\0.15.2\\websocket4net.0.15.2.nupkg.sha512",
     "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\websocketsharp-netstandard\\1.0.1\\websocketsharp-netstandard.1.0.1.nupkg.sha512",
-    "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\youtubeexplode\\5.1.6\\youtubeexplode.5.1.6.nupkg.sha512"
+    "C:\\Users\\Abhishek Adhikari\\.nuget\\packages\\youtubeexplode\\5.1.8\\youtubeexplode.5.1.8.nupkg.sha512"
   ],
   "logs": []
 }
