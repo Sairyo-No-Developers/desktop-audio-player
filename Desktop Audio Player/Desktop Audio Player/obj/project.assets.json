@@ -1075,7 +1075,7 @@
           "lib/netstandard2.0/websocket-sharp.dll": {}
         }
       },
-      "YoutubeExplode/5.1.6": {
+      "YoutubeExplode/5.1.8": {
         "type": "package",
         "dependencies": {
           "AngleSharp": "0.14.0"
@@ -3890,10 +3890,10 @@
         "websocketsharp-netstandard.nuspec"
       ]
     },
-    "YoutubeExplode/5.1.6": {
-      "sha512": "J9iXKpfkBGy7IKQwQjp0fffSZEumrimmHDm+3KLiqkvenIk7w+4ZUWEuMY8GX+MhfweHklPGJYoGG98Y+kcejg==",
+    "YoutubeExplode/5.1.8": {
+      "sha512": "1g7ruwKLaUJCoJ/zl731rybVfR+FrPohNNYG+YTZtBymBihDp4KpAHCRt8PXnXIJAGb+yBwJG1wZMsxCbbvG9g==",
       "type": "package",
-      "path": "youtubeexplode/5.1.6",
+      "path": "youtubeexplode/5.1.8",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3906,7 +3906,7 @@
         "lib/netstandard2.0/YoutubeExplode.xml",
         "lib/netstandard2.1/YoutubeExplode.dll",
         "lib/netstandard2.1/YoutubeExplode.xml",
-        "youtubeexplode.5.1.6.nupkg.sha512",
+        "youtubeexplode.5.1.8.nupkg.sha512",
         "youtubeexplode.nuspec"
       ]
     }
@@ -3917,7 +3917,7 @@
       "Newtonsoft.Json >= 12.0.3",
       "WebSocket4Net >= 0.15.2",
       "WebSocketSharp-netstandard >= 1.0.1",
-      "YoutubeExplode >= 5.1.6",
+      "YoutubeExplode >= 5.1.8",
       "taglib-sharp-netstandard2.0 >= 2.1.0"
     ]
   },
@@ -3976,7 +3976,7 @@
           },
           "YoutubeExplode": {
             "target": "Package",
-            "version": "[5.1.6, )"
+            "version": "[5.1.8, )"
           },
           "taglib-sharp-netstandard2.0": {
             "target": "Package",
